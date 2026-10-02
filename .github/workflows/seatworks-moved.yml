@@ -1,0 +1,43 @@
+# Builds the page again when Seatworks has moved. The page is Seatworks' editor and lists Seatworks' own template, and
+# nothing here is told of a push there, so this looks: the commit the page was built from against where Seatworks is.
+name: Seatworks moved
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  look:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build the page again if Seatworks is past it
+        env:
+          REF: ${{ vars.SEATWORKS_REF || 'main' }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          seatworks=https://github.com/sting9k/seatworks.git
+          at=$(git ls-remote "$seatworks" "refs/heads/$REF" "refs/tags/$REF" "refs/tags/$REF^{}" | tail -1 | cut -f1)
+          if [ -z "$at" ]; then
+            echo "Seatworks has no branch or tag named $REF."
+            exit 1
+          fi
+          built=$(curl -fsSL "https://$GITHUB_REPOSITORY_OWNER.github.io/${GITHUB_REPOSITORY#*/}/built-from" || true)
+          if [ "$at" = "$built" ]; then
+            echo "The page is built from $at, which is where Seatworks is."
+            exit 0
+          fi
+          # One build for one commit: a build that failed is not started again every quarter of an hour.
+          started=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gallery.yml --event workflow_dispatch \
+            --limit 50 --json displayTitle --jq '.[].displayTitle')
+          case "$started" in
+            *"$at"*)
+              echo "A build from $at was started already. If it failed, mend what stopped it and run Gallery by hand."
+              exit 0
+              ;;
+          esac
+          echo "Seatworks is at $at and the page was built from ${built:-nothing}: building it again."
+          gh workflow run gallery.yml --repo "$GITHUB_REPOSITORY" --ref main -f seatworks="$at"

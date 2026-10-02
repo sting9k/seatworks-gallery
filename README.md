@@ -8,7 +8,8 @@ team's record. You pick one, open it as a graph, change it, and install it. Noth
 
 ## Use a template
 
-1. Open [the gallery's page](https://sting9k.github.io/seatworks-gallery/), pick a template, and press **Open**. It opens as a graph you can change.
+1. Open [the gallery's page](https://sting9k.github.io/seatworks-gallery/), pick a template, and press **Open**. It
+   opens as a graph you can change.
 2. **Export** gives you one file, `<name>.template.json`.
 3. In Paseo, open Seatworks' **Plugin** page, **Install a template**, and give the path of that file. The page says
    what the template brings before anything is installed: its roles, the agent profiles it names, each outside tool
@@ -49,6 +50,10 @@ this repository's GitHub Pages; on a pull request it is only built.
 
 - Pages is switched on once, in this repository's settings: **Pages**, source **GitHub Actions**.
 - The branch or tag of Seatworks it builds from is the repository variable `SEATWORKS_REF`, `main` when it is not set.
+- The page follows Seatworks by itself. Every quarter of an hour `.github/workflows/seatworks-moved.yml` compares the
+  commit the page was built from, which the page keeps at `built-from`, with where that branch is, and builds the page
+  again when they differ. It starts one build for one commit: a build that failed is run again by hand, from
+  **Actions**, **Gallery**, once what stopped it is mended.
 
 To see the page on your own machine, with a checkout of Seatworks beside this one:
 

@@ -1,12 +1,18 @@
 # Builds the gallery: the templates kept here beside the one that comes with Seatworks, and the page that lists them.
 # On a pull request the build is the check a template passes to be published; on main the page is published.
 name: Gallery
+# A build started for a commit of Seatworks is named by it, so it is started for that commit once.
+run-name: ${{ inputs.seatworks && format('Seatworks at {0}', inputs.seatworks) || '' }}
 
 on:
   pull_request:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      seatworks:
+        description: The commit of Seatworks to build from; left empty, the branch or tag SEATWORKS_REF names
+        required: false
 
 permissions:
   contents: read
@@ -30,7 +36,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: sting9k/seatworks
-          ref: ${{ vars.SEATWORKS_REF || 'main' }}
+          ref: ${{ inputs.seatworks || vars.SEATWORKS_REF || 'main' }}
           path: seatworks
           persist-credentials: false
 
@@ -50,6 +56,11 @@ jobs:
 
       - name: Build the page beside it
         run: npx vite build editor
+        working-directory: seatworks
+
+      # The page says which commit of Seatworks it was built from, which is how it is known to be behind.
+      - name: Say what it was built from
+        run: git rev-parse HEAD > editor/dist/built-from
         working-directory: seatworks
 
       - uses: actions/upload-pages-artifact@v5
