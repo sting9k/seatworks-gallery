@@ -4,9 +4,11 @@ The gallery of templates for [Seatworks](https://github.com/sting9k/seatworks), 
 coding agents. A template is a way of working: the roles of a team, what each one reads, and what is asked of the
 team's record. You pick one, open it as a graph, change it, and install it. Nothing here is code.
 
+**The gallery's page: https://sting9k.github.io/seatworks-gallery/**
+
 ## Use a template
 
-1. Open the gallery's page, pick a template, and press **Open**. It opens as a graph you can change.
+1. Open [the gallery's page](https://sting9k.github.io/seatworks-gallery/), pick a template, and press **Open**. It opens as a graph you can change.
 2. **Export** gives you one file, `<name>.template.json`.
 3. In Paseo, open Seatworks' **Plugin** page, **Install a template**, and give the path of that file. The page says
    what the template brings before anything is installed: its roles, the agent profiles it names, each outside tool
